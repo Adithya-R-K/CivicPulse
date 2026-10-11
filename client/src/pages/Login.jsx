@@ -32,16 +32,6 @@ const Login = () => {
     }
   };
 
-  const fillAdmin = () => {
-    setUsername('admin');
-    setPassword('Admin123');
-  };
-
-  const fillUser = () => {
-    setUsername('demo_user');
-    setPassword('password123');
-  };
-
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
@@ -145,37 +135,6 @@ const Login = () => {
                     Register here
                   </Link>
                 </p>
-              </div>
-
-              {/* Demo Credentials Alert Box */}
-              <div className="alert alert-info mt-4 small">
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <strong>
-                    <i className="fas fa-info-circle me-1"></i> Demo Credentials:
-                  </strong>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={fillAdmin}
-                      className="btn btn-sm btn-outline-primary py-0 px-2 me-1"
-                    >
-                      Use Admin
-                    </button>
-                    <button
-                      type="button"
-                      onClick={fillUser}
-                      className="btn btn-sm btn-outline-secondary py-0 px-2"
-                    >
-                      Use Citizen
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <strong>Admin:</strong> admin / Admin123
-                </div>
-                <div>
-                  <strong>User:</strong> demo_user / password123
-                </div>
               </div>
             </div>
           </div>
