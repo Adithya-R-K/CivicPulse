@@ -1,0 +1,15 @@
+{
+  "name": "civicpulse-mern-monorepo",
+  "version": "1.0.0",
+  "description": "CivicPulse — Full MERN Stack Community Complaint Management System",
+  "scripts": {
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "seed": "npm run seed --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

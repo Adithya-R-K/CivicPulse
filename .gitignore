@@ -1,0 +1,21 @@
+# Node & JavaScript dependencies
+node_modules/
+**/node_modules/
+client/dist/
+
+# Environment Variables & Secrets
+.env
+**/.env
+server/.env
+
+# Python & System
+__pycache__/
+*.pyc
+*.pyo
+civicpulse.db
+*.sqlite3
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
