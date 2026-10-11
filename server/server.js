@@ -44,6 +44,13 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+// Compatibility route mounts if reverse proxy / Vercel rewrite strips prefix
+app.use('/auth', authRoutes);
+app.use('/complaints', complaintRoutes);
+app.use('/analytics', analyticsRoutes);
+app.use('/chat', chatRoutes);
+app.use('/notifications', notificationRoutes);
+
 // Backward-compatibility endpoints matching old frontend/mobile calls
 app.get('/api/dashboard-stats', async (req, res) => {
   const analyticsController = require('./controllers/analyticsController');

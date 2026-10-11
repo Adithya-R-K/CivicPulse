@@ -126,8 +126,24 @@ function getDepartmentForCategory(category) {
 
 /**
  * Full AI Analysis Pipeline
+ * Supports Vercel internal service binding via process.env.AI_SERVICE_URL
  */
-function analyzeComplaint(title, description) {
+async function analyzeComplaint(title, description) {
+  // If internal service binding for Flask AI engine is configured
+  if (process.env.AI_SERVICE_URL) {
+    try {
+      const axios = require('axios');
+      const targetUrl = new URL('/api/ai/analyze', process.env.AI_SERVICE_URL);
+      const res = await axios.post(targetUrl.toString(), { title, description }, { timeout: 3500 });
+      if (res.data && res.data.success && res.data.analysis) {
+        return res.data.analysis;
+      }
+    } catch (err) {
+      console.warn('AI Service binding call failed, using local fallback:', err.message);
+    }
+  }
+
+  // Local fallback prediction
   const categoryResult = predictCategory(title, description);
   const priorityResult = predictPriority(title, description);
   const spamResult = detectSpam(title, description);

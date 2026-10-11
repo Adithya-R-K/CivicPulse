@@ -102,7 +102,7 @@ exports.getComplaintById = async (req, res) => {
 exports.createComplaint = async (req, res) => {
   try {
     const { title, description, category, location, latitude, longitude, imageUrl } = req.body;
-    const aiAnalysis = analyzeComplaint(title, description);
+    const aiAnalysis = await analyzeComplaint(title, description);
 
     const newComp = {
       _id: '660e1d0f5e71826b' + Math.floor(Math.random() * 100000000),

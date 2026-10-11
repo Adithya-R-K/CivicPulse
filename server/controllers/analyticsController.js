@@ -168,7 +168,7 @@ exports.getDepartmentStats = async (req, res) => {
 exports.predictAI = async (req, res) => {
   try {
     const { title, description } = req.body;
-    const prediction = analyzeComplaint(title || '', description || '');
+    const prediction = await analyzeComplaint(title || '', description || '');
     res.json({ success: true, prediction });
   } catch (error) {
     res.status(500).json({ message: error.message });

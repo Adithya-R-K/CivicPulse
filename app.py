@@ -1,4 +1,6 @@
+# pyrefly: ignore [missing-import]
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+# pyrefly: ignore [missing-import]
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import os
@@ -915,6 +917,54 @@ def create_notification(user_id, title, message, notification_type='info', compl
             conn.commit()
     except Exception as e:
         print(f"Error creating notification: {str(e)}")
+
+# ==================== INTERNAL AI SERVICE ENDPOINT ====================
+
+@app.route('/api/ai/analyze', methods=['POST'])
+def internal_ai_analyze():
+    """Internal AI endpoint callable via Vercel service binding"""
+    try:
+        data = request.get_json() or {}
+        title = data.get('title', '')
+        description = data.get('description', '')
+        
+        category_result = ai_engine.predict_category(title, description)
+        category = category_result.get('category', 'Roads')
+        cat_confidence = category_result.get('confidence', 0.8)
+        
+        priority_result, priority_confidence = ai_engine.predict_priority(title, description, category)
+        priority = priority_result.value if hasattr(priority_result, 'value') else str(priority_result)
+        
+        spam_analysis = ai_engine.analyze_spam_risk(title, description)
+        spam_score = spam_analysis.get('spam_score', 0.0)
+        
+        dept_mapping = {
+            'Roads': 'Roads & Transportation',
+            'Water': 'Water & Sewage',
+            'Electricity': 'Electricity Department',
+            'Waste': 'Waste Management',
+            'Parks': 'Parks & Recreation',
+            'Safety': 'Public Safety',
+            'Construction': 'Building & Construction',
+            'Other': 'General Civic Administration',
+        }
+        department = dept_mapping.get(category, 'General Civic Administration')
+        
+        return jsonify({
+            'success': True,
+            'analysis': {
+                'category': category,
+                'confidence': cat_confidence,
+                'priority': priority,
+                'spamScore': spam_score,
+                'department': department,
+                'sentimentScore': -0.8 if priority == 'Urgent' else -0.3,
+                'urgencyScore': 0.95 if priority == 'Urgent' else (0.75 if priority == 'High' else 0.4)
+            }
+        })
+    except Exception as e:
+        print(f"Internal AI analyze error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
