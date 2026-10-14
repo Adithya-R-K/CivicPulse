@@ -26,10 +26,29 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
 
   if (adminOnly && !isAdmin) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
+};
+
+// Root route handler: deployed link directly lands on login page (or user dashboard if already signed in)
+const RootLanding = () => {
+  const { user, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="container py-5 text-center text-muted">
+        <i className="fas fa-spinner fa-spin fa-2x me-2"></i>Loading...
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
+  }
+
+  return <Navigate to="/login" replace />;
 };
 
 function App() {
@@ -41,7 +60,10 @@ function App() {
 
           <main className="flex-grow-1">
             <Routes>
-              <Route path="/" element={<Home />} />
+              {/* Deployed link lands on login page */}
+              <Route path="/" element={<RootLanding />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/feed" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route

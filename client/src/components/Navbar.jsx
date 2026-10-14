@@ -31,7 +31,10 @@ const Navbar = () => {
           </button>
         )}
 
-        <Link className="navbar-brand fw-bold" to="/">
+        <Link
+          className="navbar-brand fw-bold"
+          to={user ? (isAdmin ? "/admin" : "/dashboard") : "/login"}
+        >
           <i className="fas fa-heartbeat me-2"></i>CivicPulse
         </Link>
 
@@ -45,11 +48,13 @@ const Navbar = () => {
 
         <div className={`collapse navbar-collapse ${collapsed ? '' : 'show'}`}>
           <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/" onClick={() => setCollapsed(true)}>
-                Home
-              </Link>
-            </li>
+            {user && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/home" onClick={() => setCollapsed(true)}>
+                  Public Feed
+                </Link>
+              </li>
+            )}
 
             {user && (
               <>
