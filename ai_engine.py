@@ -42,9 +42,10 @@ for resource in nltk_resources:
     except:
         LOGGER.warning(f"Could not download {resource}")
 
-MODEL_DIR = "models"
-DATA_DIR = "data"
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "models")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+CONFIG_FILE = os.path.join(BASE_DIR, "config.json")
 
 # -------------------- DATA CLASSES & ENUMS --------------------
 
@@ -418,9 +419,10 @@ class AdvancedAIEngine:
         self._train_models(df, texts)
         
         # Initialize similarity vectorizer
+        ngram_range = tuple(self.config['model_params']['category']['ngram_range'])
         self.similarity_vectorizer = TfidfVectorizer(
             max_features=self.config['model_params']['category']['max_features'],
-            ngram_range=self.config['model_params']['category']['ngram_range']
+            ngram_range=ngram_range
         ).fit(texts)
         
         # Save models
@@ -430,12 +432,13 @@ class AdvancedAIEngine:
     
     def _train_models(self, df: pd.DataFrame, texts: List[str]):
         """Train category and priority models with advanced techniques"""
+        ngram_range = tuple(self.config['model_params']['category']['ngram_range'])
         
         # Train category model
         self.category_model = Pipeline([
             ("tfidf", TfidfVectorizer(
                 max_features=self.config['model_params']['category']['max_features'],
-                ngram_range=self.config['model_params']['category']['ngram_range'],
+                ngram_range=ngram_range,
                 min_df=self.config['model_params']['category']['min_df'],
                 max_df=self.config['model_params']['category']['max_df']
             )),

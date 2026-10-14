@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 
+let inMemoryUsers = [];
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'civicpulse_secret_key_2026', {
     expiresIn: '30d',
@@ -53,6 +55,18 @@ exports.register = async (req, res) => {
 
     // Fallback if DB is connecting
     const fallbackId = '660e1d0f5e71826b' + Math.floor(Math.random() * 100000000);
+    const mockUser = {
+      _id: fallbackId,
+      id: fallbackId,
+      username,
+      email,
+      password,
+      fullName: name,
+      role: 'citizen',
+      isAdmin: false,
+    };
+    inMemoryUsers.push(mockUser);
+
     res.status(201).json({
       success: true,
       user: {
@@ -80,7 +94,31 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Please provide both username and password' });
     }
 
-    // Direct check for demo accounts (instant, zero delay)
+    // 1. Check MongoDB first if connected to get the actual database user and ID
+    if (mongoose.connection.readyState === 1) {
+      const user = await User.findOne({
+        $or: [{ username }, { email: username.toLowerCase() }],
+      }).select('+password');
+
+      if (user && (await user.matchPassword(password))) {
+        return res.json({
+          success: true,
+          user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            fullName: user.fullName,
+            address: user.address,
+            phone: user.phone,
+            role: user.role,
+            isAdmin: user.isAdmin,
+          },
+          token: generateToken(user._id),
+        });
+      }
+    }
+
+    // 2. Direct fallback for offline demo accounts if DB has no record
     if (
       (username === 'admin' || username === 'admin@civicpulse.gov') &&
       password === 'Admin123'
@@ -119,28 +157,23 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Check MongoDB if connected
-    if (mongoose.connection.readyState === 1) {
-      const user = await User.findOne({
-        $or: [{ username }, { email: username.toLowerCase() }],
-      }).select('+password');
-
-      if (user && (await user.matchPassword(password))) {
-        return res.json({
-          success: true,
-          user: {
-            id: user._id,
-            username: user.username,
-            email: user.email,
-            fullName: user.fullName,
-            address: user.address,
-            phone: user.phone,
-            role: user.role,
-            isAdmin: user.isAdmin,
-          },
-          token: generateToken(user._id),
-        });
-      }
+    // Check in-memory users if DB is offline/connecting
+    const memoryUser = inMemoryUsers.find(
+      (u) => (u.username === username || u.email === username.toLowerCase()) && u.password === password
+    );
+    if (memoryUser) {
+      return res.json({
+        success: true,
+        user: {
+          id: memoryUser.id || memoryUser._id,
+          username: memoryUser.username,
+          email: memoryUser.email,
+          fullName: memoryUser.fullName,
+          role: memoryUser.role,
+          isAdmin: memoryUser.isAdmin,
+        },
+        token: generateToken(memoryUser.id || memoryUser._id),
+      });
     }
 
     return res.status(401).json({ message: 'Invalid credentials. Check username and password.' });

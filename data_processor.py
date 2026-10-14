@@ -1,8 +1,10 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from database import Database
+# pyrefly: ignore [missing-import]
 from faker import Faker
 import random
+# pyrefly: ignore [missing-import]
 from werkzeug.security import generate_password_hash
 
 class DataProcessor:

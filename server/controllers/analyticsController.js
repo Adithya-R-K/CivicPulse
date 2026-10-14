@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const Complaint = require('../models/Complaint');
 const Department = require('../models/Department');
-const { analyzeComplaint } = require('../utils/aiHelper');
+const {
+  fetchIntelligenceAnalyticsSummary,
+  analyzeComplaintWithIntelligenceService,
+} = require('../services/intelligenceClient');
 
 const DEFAULT_COMPLAINTS = [
   {
@@ -43,48 +46,95 @@ const DEFAULT_COMPLAINTS = [
     upvotesCount: 5,
     createdAt: new Date('2026-01-28T14:07:02Z'),
   },
-  {
-    _id: '660e1d0f5e71826b52a12304',
-    title: 'Garbage not cleared near Singanallur Lake',
-    description: 'Garbage has been piled up for several days near Singanallur Lake Road, causing foul smell.',
-    category: 'Waste',
-    location: 'Singanallur Lake Road',
-    coordinates: { latitude: 11.0000, longitude: 77.0268 },
-    priority: 'Medium',
-    status: 'Resolved',
-    department: 'Waste Management',
-    upvotesCount: 3,
-    createdAt: new Date('2026-01-28T14:07:34Z'),
-  },
-  {
-    _id: '660e1d0f5e71826b52a12305',
-    title: 'Broken playground equipment at VOC Park',
-    description: 'Playground equipment in VOC Park is damaged and unsafe for children.',
-    category: 'Parks',
-    location: 'VOC Park & Grounds',
-    coordinates: { latitude: 11.0122, longitude: 76.9502 },
-    priority: 'Low',
-    status: 'Resolved',
-    department: 'Parks & Recreation',
-    upvotesCount: 2,
-    createdAt: new Date('2026-01-28T14:08:09Z'),
-  },
-  {
-    _id: '660e1d0f5e71826b52a12306',
-    title: 'Streetlight not working near Ukkadam',
-    description: 'Multiple streetlights are not functioning near Ukkadam junction, making the area unsafe at night.',
-    category: 'Safety',
-    location: 'Ukkadam Junction',
-    coordinates: { latitude: 10.9946, longitude: 76.9580 },
-    priority: 'High',
-    status: 'In Progress',
-    department: 'Public Safety',
-    upvotesCount: 6,
-    createdAt: new Date('2026-01-28T15:41:58Z'),
-  },
 ];
 
-// @route   GET /api/analytics/stats
+/**
+ * @route   GET /api/v1/analytics/summary
+ * @desc    Integrated Analytics Workflow: Combines Core MongoDB metrics with Intelligence Service SQLite metrics via HTTP REST
+ * @access  Public / Admin
+ */
+exports.getIntegratedAnalyticsSummary = async (req, res) => {
+  try {
+    const correlationId = req.headers['x-correlation-id'] || `corr_analytics_${Date.now()}`;
+
+    // 1. Gather Core MongoDB statistics
+    let totalComplaints = 0;
+    let resolved = 0;
+    let inProgress = 0;
+    let submitted = 0;
+    let categoryBreakdown = {};
+    let priorityBreakdown = {};
+
+    if (mongoose.connection.readyState === 1) {
+      totalComplaints = await Complaint.countDocuments();
+      resolved = await Complaint.countDocuments({ status: 'Resolved' });
+      inProgress = await Complaint.countDocuments({ status: 'In Progress' });
+      submitted = await Complaint.countDocuments({ status: 'Submitted' });
+
+      const catAgg = await Complaint.aggregate([
+        { $group: { _id: '$category', count: { $sum: 1 } } },
+      ]);
+      catAgg.forEach((c) => {
+        if (c._id) categoryBreakdown[c._id] = c.count;
+      });
+
+      const prioAgg = await Complaint.aggregate([
+        { $group: { _id: '$priority', count: { $sum: 1 } } },
+      ]);
+      prioAgg.forEach((p) => {
+        if (p._id) priorityBreakdown[p._id] = p.count;
+      });
+    } else {
+      totalComplaints = DEFAULT_COMPLAINTS.length;
+      resolved = 1;
+      inProgress = 1;
+      submitted = 1;
+      categoryBreakdown = { Roads: 1, Water: 1, Electricity: 1 };
+      priorityBreakdown = { High: 1, Urgent: 2 };
+    }
+
+    const resolutionRate =
+      totalComplaints > 0 ? Number(((resolved / totalComplaints) * 100).toFixed(1)) : 0.0;
+
+    // 2. MANDATORY INTER-SERVICE COMMUNICATION:
+    // Query Civic Intelligence Service for AI metrics and analysis history summary
+    const intelligenceResult = await fetchIntelligenceAnalyticsSummary(correlationId);
+
+    return res.json({
+      success: true,
+      service: 'civic-core-service',
+      correlation_id: correlationId,
+      operational_metrics: {
+        total_complaints: totalComplaints,
+        resolved,
+        in_progress: inProgress,
+        pending: submitted,
+        resolution_rate: resolutionRate,
+        category_breakdown: categoryBreakdown,
+        priority_breakdown: priorityBreakdown,
+      },
+      ai_intelligence_service: {
+        connected: intelligenceResult.available,
+        data_source: 'SQLite (intelligence.db) via REST API',
+        metrics: intelligenceResult.metrics || {
+          total_analyses: totalComplaints,
+          category_distribution: categoryBreakdown,
+          spam_statistics: { spam_rate_percentage: 0.0 },
+          note: 'Live Intelligence Service metrics unreachable; showing cached view',
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error generating integrated analytics summary:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * @route   GET /api/v1/analytics/stats
+ * @route   GET /api/analytics/stats
+ * @desc    Basic dashboard statistics
+ */
 exports.getDashboardStats = async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {
@@ -103,7 +153,6 @@ exports.getDashboardStats = async (req, res) => {
       });
     }
 
-    // Default stats
     res.json({
       success: true,
       total_complaints: 18,
@@ -113,11 +162,14 @@ exports.getDashboardStats = async (req, res) => {
       resolution_rate: 44.4,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @route   GET /api/analytics/geojson
+/**
+ * @route   GET /api/v1/analytics/geojson
+ * @route   GET /api/complaints/geojson
+ */
 exports.getGeoJSON = async (req, res) => {
   try {
     let complaints = DEFAULT_COMPLAINTS;
@@ -129,7 +181,7 @@ exports.getGeoJSON = async (req, res) => {
       type: 'Feature',
       geometry: {
         type: 'Point',
-        coordinates: [c.coordinates.longitude, c.coordinates.latitude],
+        coordinates: [c.coordinates?.longitude || 76.9558, c.coordinates?.latitude || 11.0168],
       },
       properties: {
         id: c._id,
@@ -145,32 +197,53 @@ exports.getGeoJSON = async (req, res) => {
 
     res.json({ type: 'FeatureCollection', features });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @route   GET /api/analytics/departments
+/**
+ * @route   GET /api/v1/departments
+ * @route   GET /api/analytics/departments
+ */
 exports.getDepartmentStats = async (req, res) => {
-  res.json({
-    success: true,
-    departments: [
-      { _id: '1', name: 'Roads & Transportation', email: 'roads@city.gov', slaHours: 48 },
-      { _id: '2', name: 'Water & Sewage', email: 'water@city.gov', slaHours: 24 },
-      { _id: '3', name: 'Electricity Department', email: 'power@city.gov', slaHours: 12 },
-      { _id: '4', name: 'Waste Management', email: 'waste@city.gov', slaHours: 72 },
-      { _id: '5', name: 'Parks & Recreation', email: 'parks@city.gov', slaHours: 120 },
-      { _id: '6', name: 'Public Safety', email: 'safety@city.gov', slaHours: 6 },
-    ],
-  });
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const depts = await Department.find();
+      if (depts && depts.length > 0) {
+        return res.json({ success: true, count: depts.length, departments: depts });
+      }
+    }
+
+    res.json({
+      success: true,
+      departments: [
+        { _id: '1', name: 'Roads & Transportation', email: 'roads@city.gov', slaHours: 48 },
+        { _id: '2', name: 'Water & Sewage', email: 'water@city.gov', slaHours: 24 },
+        { _id: '3', name: 'Electricity Department', email: 'power@city.gov', slaHours: 12 },
+        { _id: '4', name: 'Waste Management', email: 'waste@city.gov', slaHours: 72 },
+        { _id: '5', name: 'Parks & Recreation', email: 'parks@city.gov', slaHours: 120 },
+        { _id: '6', name: 'Public Safety', email: 'safety@city.gov', slaHours: 6 },
+        { _id: '7', name: 'Building & Construction', email: 'building@city.gov', slaHours: 96 },
+      ],
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
-// @route   POST /api/ai/predict
+/**
+ * @route   POST /api/v1/analytics/predict-ai
+ * @desc    Direct AI classification pass-through
+ */
 exports.predictAI = async (req, res) => {
   try {
     const { title, description } = req.body;
-    const prediction = await analyzeComplaint(title || '', description || '');
+    const prediction = await analyzeComplaintWithIntelligenceService({
+      title: title || '',
+      description: description || '',
+    });
     res.json({ success: true, prediction });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };

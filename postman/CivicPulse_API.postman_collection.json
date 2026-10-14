@@ -1,61 +1,38 @@
 {
   "info": {
-    "name": "CivicPulse REST API Collection",
-    "_postman_id": "c1v1c-pu1s3-m3rn-2026-api",
-    "description": "Complete Postman Collection for CivicPulse MERN Stack REST API endpoints with JWT Authentication, Complaints CRUD, AI prediction, and Analytics.",
+    "name": "CivicPulse Microservices API Collection",
+    "_postman_id": "civicpulse-microservices-v2-collection",
+    "description": "Comprehensive Postman Collection for CivicPulse Microservices Architecture: Civic Core Service (Node/Express/MongoDB) and Civic Intelligence Service (Python/Flask/SQLite).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:5000",
-      "type": "string"
-    },
-    {
-      "key": "token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "complaint_id",
-      "value": "",
-      "type": "string"
-    }
+    { "key": "core_base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "intelligence_base_url", "value": "http://localhost:5001", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "admin_token", "value": "", "type": "string" },
+    { "key": "complaint_id", "value": "660e1d0f5e71826b52a12301", "type": "string" },
+    { "key": "analysis_id", "value": "1", "type": "string" }
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "1. Civic Core Service (Node.js/Express)",
       "item": [
         {
-          "name": "Register Citizen",
+          "name": "Health Check (Core Service)",
           "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"johndoe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\",\n  \"fullName\": \"John Doe\",\n  \"address\": \"123 Park Street, Coimbatore\",\n  \"phone\": \"9876543210\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/register",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "register"]
-            }
+            "method": "GET",
+            "url": { "raw": "{{core_base_url}}/api/v1/health" }
           }
         },
         {
-          "name": "Login Citizen (Auto Save Token)",
+          "name": "Auth - Register Citizen",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "const jsonData = pm.response.json();",
-                  "if (jsonData.token) {",
-                  "    pm.collectionVariables.set('token', jsonData.token);",
-                  "    console.log('Token saved:', jsonData.token);",
-                  "}"
+                  "const json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('token', json.token);"
                 ],
                 "type": "text/javascript"
               }
@@ -63,31 +40,47 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"citizen_demo\",\n  \"email\": \"citizen_demo@civicpulse.gov\",\n  \"password\": \"Citizen123\",\n  \"fullName\": \"Coimbatore Citizen\",\n  \"address\": \"Gandhipuram, Coimbatore\",\n  \"phone\": \"9876500001\"\n}"
+            },
+            "url": { "raw": "{{core_base_url}}/api/v1/auth/register" }
+          }
+        },
+        {
+          "name": "Auth - Login Citizen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('token', json.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"citizen\",\n  \"password\": \"Citizen123\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "login"]
-            }
+            "url": { "raw": "{{core_base_url}}/api/v1/auth/login" }
           }
         },
         {
-          "name": "Login Admin",
+          "name": "Auth - Login Admin",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "const jsonData = pm.response.json();",
-                  "if (jsonData.token) {",
-                  "    pm.collectionVariables.set('token', jsonData.token);",
-                  "}"
+                  "const json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('admin_token', json.token);"
                 ],
                 "type": "text/javascript"
               }
@@ -95,77 +88,31 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "login"]
-            }
+            "url": { "raw": "{{core_base_url}}/api/v1/auth/login" }
           }
         },
         {
-          "name": "Get Current Profile (Me)",
+          "name": "Auth - Get Current Profile (Protected)",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/auth/me",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "me"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Complaints",
-      "item": [
-        {
-          "name": "List All Complaints",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/complaints",
-              "host": ["{{base_url}}"],
-              "path": ["api", "complaints"]
-            }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{core_base_url}}/api/v1/auth/me" }
           }
         },
         {
-          "name": "Filter Complaints by Category",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/complaints?category=Roads",
-              "host": ["{{base_url}}"],
-              "path": ["api", "complaints"],
-              "query": [
-                { "key": "category", "value": "Roads" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create Complaint (AI Categorized)",
+          "name": "Complaints - Submit with AI Analysis (Inter-Service)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "const jsonData = pm.response.json();",
-                  "if (jsonData.complaint && jsonData.complaint._id) {",
-                  "    pm.collectionVariables.set('complaint_id', jsonData.complaint._id);",
-                  "}"
+                  "const json = pm.response.json();",
+                  "if (json.complaint && json.complaint._id) pm.collectionVariables.set('complaint_id', json.complaint._id);"
                 ],
                 "type": "text/javascript"
               }
@@ -179,62 +126,27 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Urgent drinking water pipe broken near station\",\n  \"description\": \"Clean water is gushing out of an underground pipeline near the railway station road.\",\n  \"location\": \"Coimbatore Railway Junction\",\n  \"latitude\": 11.0005,\n  \"longitude\": 76.9654\n}"
+              "raw": "{\n  \"title\": \"Major water pipeline burst on Avinashi Road\",\n  \"description\": \"Clean water is gushing out of broken municipal pipeline beside Peelamedu signal. Serious flooding hazard.\",\n  \"location\": \"Avinashi Road near Peelamedu\",\n  \"latitude\": 11.0280,\n  \"longitude\": 77.0043\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/complaints",
-              "host": ["{{base_url}}"],
-              "path": ["api", "complaints"]
-            }
+            "url": { "raw": "{{core_base_url}}/api/v1/complaints" }
           }
         },
         {
-          "name": "Get Complaint by ID",
+          "name": "Complaints - List All (With Pagination & Filters)",
           "request": {
             "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/complaints/{{complaint_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "complaints", "{{complaint_id}}"]
-            }
+            "url": { "raw": "{{core_base_url}}/api/v1/complaints?limit=10&page=1" }
           }
         },
         {
-          "name": "Toggle Upvote",
+          "name": "Complaints - Get By ID",
           "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/complaints/{{complaint_id}}/upvote",
-              "host": ["{{base_url}}"],
-              "path": ["api", "complaints", "{{complaint_id}}", "upvote"]
-            }
+            "method": "GET",
+            "url": { "raw": "{{core_base_url}}/api/v1/complaints/{{complaint_id}}" }
           }
         },
         {
-          "name": "Add Discussion Comment",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"comment\": \"Municipal crew was spotted inspecting the spot this morning.\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/complaints/{{complaint_id}}/comments",
-              "host": ["{{base_url}}"],
-              "path": ["api", "complaints", "{{complaint_id}}", "comments"]
-            }
-          }
-        },
-        {
-          "name": "Admin Update Status",
+          "name": "Complaints - Update Details (PUT)",
           "request": {
             "method": "PUT",
             "header": [
@@ -243,111 +155,197 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"In Progress\",\n  \"department\": \"Water & Sewage\"\n}"
+              "raw": "{\n  \"location\": \"Avinashi Road near Peelamedu Flyover, Coimbatore\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/complaints/{{complaint_id}}/status",
-              "host": ["{{base_url}}"],
-              "path": ["api", "complaints", "{{complaint_id}}", "status"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Analytics & AI",
-      "item": [
-        {
-          "name": "Dashboard Statistics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/analytics/stats",
-              "host": ["{{base_url}}"],
-              "path": ["api", "analytics", "stats"]
-            }
+            "url": { "raw": "{{core_base_url}}/api/v1/complaints/{{complaint_id}}" }
           }
         },
         {
-          "name": "GeoJSON Map Points",
+          "name": "Complaints - Update Status (PATCH Admin)",
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/analytics/geojson",
-              "host": ["{{base_url}}"],
-              "path": ["api", "analytics", "geojson"]
-            }
-          }
-        },
-        {
-          "name": "Preview AI Prediction",
-          "request": {
-            "method": "POST",
+            "method": "PATCH",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Live electric wire falling across street\",\n  \"description\": \"High voltage transformer wire snapped and fell across the road near residential school\"\n}"
+              "raw": "{\n  \"status\": \"In Progress\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/analytics/predict",
-              "host": ["{{base_url}}"],
-              "path": ["api", "analytics", "predict"]
-            }
+            "url": { "raw": "{{core_base_url}}/api/v1/complaints/{{complaint_id}}/status" }
           }
         },
         {
-          "name": "AI Civic Chatbot",
+          "name": "Complaints - Upvote",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{core_base_url}}/api/v1/complaints/{{complaint_id}}/upvote" }
+          }
+        },
+        {
+          "name": "Complaints - Add Comment",
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"message\": \"How can I report a sewer leak on my street?\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/chat",
-              "host": ["{{base_url}}"],
-              "path": ["api", "chat"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Notifications",
-      "item": [
-        {
-          "name": "Get Notifications",
-          "request": {
-            "method": "GET",
-            "header": [
+              { "key": "Content-Type", "value": "application/json" },
               { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
-            "url": {
-              "raw": "{{base_url}}/api/notifications",
-              "host": ["{{base_url}}"],
-              "path": ["api", "notifications"]
-            }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"Municipal ward team has arrived at the location to isolate valve.\"\n}"
+            },
+            "url": { "raw": "{{core_base_url}}/api/v1/complaints/{{complaint_id}}/comments" }
           }
         },
         {
-          "name": "Mark All As Read",
+          "name": "Analytics - Integrated Summary (Core + Intelligence)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{core_base_url}}/api/v1/analytics/summary" }
+          }
+        },
+        {
+          "name": "Analytics - Department List",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{core_base_url}}/api/v1/departments" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Civic Intelligence Service (Python/Flask)",
+      "item": [
+        {
+          "name": "Health Check (Intelligence Service)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/health" }
+          }
+        },
+        {
+          "name": "AI - Full Analyze & Persist to SQLite",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.analysis_id) pm.collectionVariables.set('analysis_id', json.analysis_id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Live electric wire snapping near school - URGENT\",\n  \"description\": \"High tension electric wire has snapped and sparking on the ground. Immediate hazard.\"\n}"
+            },
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/analyze" }
+          }
+        },
+        {
+          "name": "AI - Classify Category Only",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Potholes on Cross Cut Road\",\n  \"description\": \"Deep crater-like potholes damaging car tires and causing traffic blocks.\"\n}"
+            },
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/classify" }
+          }
+        },
+        {
+          "name": "AI - Predict Priority",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fire in commercial garbage dumpster\",\n  \"description\": \"Dense smoke and flames rising from dumpster next to petrol pump - EMERGENCY!\",\n  \"category\": \"Safety\"\n}"
+            },
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/predict-priority" }
+          }
+        },
+        {
+          "name": "AI - Detect Spam",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"CLAIM FREE CRYPTO AIRDROP NOW\",\n  \"description\": \"Click http://free-airdrop.xyz to claim $500 lottery jackpot right now!\"\n}"
+            },
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/detect-spam" }
+          }
+        },
+        {
+          "name": "AI - Similarity Detection",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pothole on Avinashi Road near Peelamedu\",\n  \"description\": \"Severe potholes near Peelamedu bus stop causing traffic jams.\",\n  \"existing_complaints\": [\n    {\n      \"id\": \"comp_001\",\n      \"title\": \"Deep pothole on Avinashi Road\",\n      \"description\": \"Large potholes on Avinashi Road near Peelamedu causing vehicle damage.\",\n      \"category\": \"Roads\",\n      \"status\": \"Submitted\"\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/similar-complaints" }
+          }
+        },
+        {
+          "name": "AI - Analytics Summary from SQLite",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/analytics/summary" }
+          }
+        },
+        {
+          "name": "SQLite CRUD - List Analysis History",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/history?limit=10" }
+          }
+        },
+        {
+          "name": "SQLite CRUD - Get Analysis By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/history/{{analysis_id}}" }
+          }
+        },
+        {
+          "name": "SQLite CRUD - Create Manual Record",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Overflowing garbage dumpster\",\n  \"description\": \"Bin overflowing for four days near market.\",\n  \"category\": \"Waste\"\n}"
+            },
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/history" }
+          }
+        },
+        {
+          "name": "SQLite CRUD - Update Analysis Record (PUT)",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/notifications/mark-all-read",
-              "host": ["{{base_url}}"],
-              "path": ["api", "notifications", "mark-all-read"]
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priority\": \"Urgent\",\n  \"is_spam\": false\n}"
+            },
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/history/{{analysis_id}}" }
+          }
+        },
+        {
+          "name": "SQLite CRUD - Delete Analysis Record (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{intelligence_base_url}}/api/v1/history/{{analysis_id}}" }
           }
         }
       ]

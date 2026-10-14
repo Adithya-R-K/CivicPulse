@@ -3,13 +3,21 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const dns = require('dns');
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {}
+
 const User = require('./models/User');
 const Complaint = require('./models/Complaint');
 const Department = require('./models/Department');
 
 const seedData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 8000,
+      family: 4,
+    });
     console.log('Connected to MongoDB Atlas for seeding...');
 
     // Clear existing collections

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: civicpulse-intelligence-service
+    env: python
+    rootDir: intelligence_service
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: PORT
+        value: 10000
+      - key: INTELLIGENCE_DB_PATH
+        value: /var/data/intelligence.db
+      - key: CORS_ORIGIN
+        value: "*"
+    disk:
+      name: intelligence-data
+      mountPath: /var/data
+      sizeGB: 1
