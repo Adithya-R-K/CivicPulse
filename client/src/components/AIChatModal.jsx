@@ -2,8 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
 import API from '../services/api';
 
-const AIChatModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const AIChatModal = ({ showFloatingButton = true, isOpen: externalIsOpen, onClose }) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = (val) => {
+    if (!val && onClose) onClose();
+    setInternalIsOpen(val);
+  };
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -70,14 +75,16 @@ const AIChatModal = () => {
   return (
     <>
       {/* Floating Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-200"
-        title="Civic AI Assistant"
-      >
-        {isOpen ? <X className="h-6 w-6" /> : <Bot className="h-7 w-7" />}
-        <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-emerald-500 rounded-full border-2 border-white"></span>
-      </button>
+      {showFloatingButton && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-xl shadow-blue-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-200"
+          title="Civic AI Assistant"
+        >
+          {isOpen ? <X className="h-6 w-6" /> : <Bot className="h-7 w-7" />}
+          <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-emerald-500 rounded-full border-2 border-white"></span>
+        </button>
+      )}
 
       {/* Chat Window */}
       {isOpen && (
@@ -119,7 +126,7 @@ const AIChatModal = () => {
                   </div>
                 )}
                 <div
-                  className={`p-3 rounded-2xl max-w-[80%] ${
+                  className={`p-3 rounded-2xl max-w-[82%] whitespace-pre-line text-xs leading-relaxed ${
                     m.role === 'user'
                       ? 'bg-blue-600 text-white rounded-tr-none shadow-sm'
                       : 'bg-white text-slate-800 border border-slate-200 rounded-tl-none shadow-sm'

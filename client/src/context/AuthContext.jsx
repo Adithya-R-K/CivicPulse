@@ -4,13 +4,22 @@ import API from '../services/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryToken = urlParams.get('token');
+  if (queryToken) {
+    localStorage.setItem('civicpulse_token', queryToken);
+  }
+
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('civicpulse_token') || null);
+  const [token, setToken] = useState(
+    queryToken || localStorage.getItem('civicpulse_token') || null
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (token) {
+      const activeToken = token || queryToken;
+      if (activeToken) {
         try {
           const { data } = await API.get('/auth/me');
           if (data.success) {
@@ -25,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchUser();
-  }, [token]);
+  }, [token, queryToken]);
 
   const login = async (username, password) => {
     const { data } = await API.post('/auth/login', { username, password });

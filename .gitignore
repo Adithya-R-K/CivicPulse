@@ -23,3 +23,8 @@ __pycache__/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Temporary verification screenshots and scratch files
+/*.png
+scratch/
+

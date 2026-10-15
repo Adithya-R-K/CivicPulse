@@ -133,6 +133,21 @@ const Login = () => {
                 </button>
               </form>
 
+              <div className="mt-3 p-3 bg-light rounded-4 text-center border">
+                <p className="small text-muted mb-2 fw-semibold">Quick Demo Admin Access</p>
+                <button
+                  type="button"
+                  id="admin-demo-btn"
+                  onClick={() => {
+                    setUsername('admin');
+                    setPassword('Admin123');
+                  }}
+                  className="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-xs"
+                >
+                  Fill Admin Credentials (admin / Admin123)
+                </button>
+              </div>
+
               <hr />
 
               <div className="text-center">
