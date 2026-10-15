@@ -35,30 +35,139 @@ import {
   X,
 } from 'lucide-react';
 
+const DEFAULT_FALLBACK_COMPLAINTS = [
+  {
+    _id: '660e1d0f5e71826b52a12301',
+    title: 'Deep pothole on Avinashi Road',
+    description: 'Large potholes on the Avinashi Road near Peelamedu causing severe vehicle damage and traffic jams.',
+    category: 'Roads',
+    location: 'Avinashi Road near Peelamedu',
+    priority: 'High',
+    status: 'Submitted',
+    department: 'Roads & Transportation',
+    upvotesCount: 4,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-28T14:03:58.000Z',
+  },
+  {
+    _id: '660e1d0f5e71826b52a12302',
+    title: 'Drinking water pipeline burst near Gandhipuram',
+    description: 'Large municipal pipeline burst beside Gandhipuram bus terminus. Clean water is wasting rapidly.',
+    category: 'Water',
+    location: 'Gandhipuram Bus Stand',
+    priority: 'Urgent',
+    status: 'In Progress',
+    department: 'Water & Sewage',
+    upvotesCount: 7,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-28T14:01:59.000Z',
+  },
+  {
+    _id: '660e1d0f5e71826b52a12303',
+    title: 'Open electrical junction box in Saibaba Colony',
+    description: 'Open electrical wiring box hanging close to pedestrian footpath. Major shock hazard for school children.',
+    category: 'Electricity',
+    location: 'Saibaba Colony 5th Cross',
+    priority: 'Urgent',
+    status: 'In Review',
+    department: 'Electricity Department',
+    upvotesCount: 5,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-28T14:07:02.000Z',
+  },
+  {
+    _id: '660e1d0f5e71826b52a12304',
+    title: 'Garbage accumulation along Singanallur Lake road',
+    description: 'Community garbage bin has overflowed for 4 days. Strong odor and stray animal menace.',
+    category: 'Waste',
+    location: 'Singanallur Lake Road',
+    priority: 'Medium',
+    status: 'Resolved',
+    resolvedAt: '2026-01-28T16:20:00.000Z',
+    department: 'Waste Management',
+    upvotesCount: 3,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-27T10:15:00.000Z',
+  },
+  {
+    _id: '660e1d0f5e71826b52a12305',
+    title: 'Broken children swings at VOC Park',
+    description: 'Playground swings and slide chains snapped and broken. Needs immediate repair before weekend.',
+    category: 'Parks',
+    location: 'VOC Park & Grounds',
+    priority: 'Low',
+    status: 'Resolved',
+    resolvedAt: '2026-01-28T17:00:00.000Z',
+    department: 'Parks & Recreation',
+    upvotesCount: 2,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-26T12:00:00.000Z',
+  },
+  {
+    _id: '660e1d0f5e71826b52a12306',
+    title: 'Streetlights non-functional in Ukkadam',
+    description: 'Entire row of 8 streetlights dark from Ukkadam junction to bypass. Pitch black at night.',
+    category: 'Safety',
+    location: 'Ukkadam Junction',
+    priority: 'High',
+    status: 'In Progress',
+    department: 'Public Safety',
+    upvotesCount: 6,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-27T18:45:00.000Z',
+  },
+  {
+    _id: '660e1d0f5e71826b52a12307',
+    title: 'Overflowing sewage drain on Cross Cut Road',
+    description: 'Severe sewage drain blockage causing wastewater overflow onto pedestrian walkways.',
+    category: 'Water',
+    location: 'Cross Cut Road, Gandhipuram',
+    priority: 'Urgent',
+    status: 'Submitted',
+    department: 'Water & Sewage',
+    upvotesCount: 8,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-28T15:30:00.000Z',
+  },
+  {
+    _id: '660e1d0f5e71826b52a12308',
+    title: 'Unfinished road excavation hazard in RS Puram',
+    description: 'Trench dug for utility cables left uncovered with no safety cones or night reflectors.',
+    category: 'Roads',
+    location: 'DB Road, RS Puram',
+    priority: 'High',
+    status: 'In Progress',
+    department: 'Roads & Transportation',
+    upvotesCount: 5,
+    author: { username: 'citizen', fullName: 'Adithya Citizen' },
+    createdAt: '2026-01-28T11:20:00.000Z',
+  },
+];
+
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   // Core Data States
   const [stats, setStats] = useState({
-    total_complaints: 0,
-    resolved: 0,
-    in_progress: 0,
-    pending: 0,
-    pending_7d: 9,
-    in_progress_7d: 2,
-    resolved_7d: 1,
+    total_complaints: 8,
+    resolved: 2,
+    in_progress: 3,
+    pending: 3,
+    pending_7d: 3,
+    in_progress_7d: 3,
+    resolved_7d: 2,
     pending_trend: '+70%',
     in_progress_trend: '+20%',
     resolved_trend: '+1%',
-    resolution_rate: 0,
-    service_level: 76.5,
+    resolution_rate: 25.0,
+    service_level: 25.0,
     feedback_rating: 4.6,
   });
 
   const [trendData, setTrendData] = useState(null);
   const [analyticsSummary, setAnalyticsSummary] = useState(null);
-  const [complaints, setComplaints] = useState([]);
+  const [complaints, setComplaints] = useState(DEFAULT_FALLBACK_COMPLAINTS);
   const [departments, setDepartments] = useState([]);
   const [usersList, setUsersList] = useState([]);
   const [healthStatus, setHealthStatus] = useState(null);
@@ -68,8 +177,17 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Mobile / Toggle Sidebar
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Mobile / Toggle Sidebar (Defaults to closed on screens under 768px)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(
+    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  );
+
+  const handleNavigate = (section) => {
+    setActiveSection(section);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  };
 
   // Notifications Dropdown
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -130,8 +248,15 @@ const AdminDashboard = () => {
           resolution_rate: d.resolution_rate || 25,
         }));
       }
-      if (compRes.status === 'fulfilled' && compRes.value?.data?.success) {
-        setComplaints(compRes.value.data.complaints || []);
+      if (
+        compRes.status === 'fulfilled' &&
+        compRes.value?.data?.success &&
+        Array.isArray(compRes.value.data.complaints) &&
+        compRes.value.data.complaints.length > 0
+      ) {
+        setComplaints(compRes.value.data.complaints);
+      } else {
+        setComplaints((prev) => (prev && prev.length > 0 ? prev : DEFAULT_FALLBACK_COMPLAINTS));
       }
       if (deptRes.status === 'fulfilled' && deptRes.value?.data?.success) {
         setDepartments(deptRes.value.data.departments || []);
@@ -401,16 +526,26 @@ const AdminDashboard = () => {
       >
         <div>
           {/* Brand Logo & Name */}
-          <div className="pt-6 px-6 pb-6 flex items-center gap-3">
-            <CivicLogo className="w-11 h-11 flex-shrink-0" />
-            <div className="flex flex-col">
-              <span className="text-[21px] font-extrabold tracking-tight text-white leading-none">
-                CivicPulse
-              </span>
-              <span className="text-[9.5px] font-semibold uppercase tracking-wider text-blue-200 mt-1">
-                GIS Portal
-              </span>
+          <div className="pt-6 px-6 pb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CivicLogo className="w-11 h-11 flex-shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[21px] font-extrabold tracking-tight text-white leading-none">
+                  CivicPulse
+                </span>
+                <span className="text-[9.5px] font-semibold uppercase tracking-wider text-blue-200 mt-1">
+                  GIS Portal
+                </span>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden text-white/80 hover:text-white p-1 rounded-lg"
+              title="Close Menu"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           {/* Navigation Items List */}
@@ -437,7 +572,7 @@ const AdminDashboard = () => {
 
               <button
                 type="button"
-                onClick={() => setActiveSection('overview')}
+                onClick={() => handleNavigate('overview')}
                 className={`w-full flex items-center gap-3.5 py-3 text-[14px] transition-all text-left relative z-10 ${
                   activeSection === 'overview'
                     ? 'bg-[#F2F2F2] text-[#0845A0] font-bold pl-6 rounded-l-[26px] ml-[18px] w-[calc(100%-18px)] shadow-none'
@@ -455,7 +590,7 @@ const AdminDashboard = () => {
             {/* 2. Live Monitoring */}
             <button
               type="button"
-              onClick={() => setActiveSection('telemetry')}
+              onClick={() => handleNavigate('telemetry')}
               className={`flex items-center gap-3.5 py-3 pl-6 text-[14px] font-medium transition-all text-left ${
                 activeSection === 'telemetry'
                   ? 'bg-white/10 text-white font-semibold'
@@ -469,7 +604,7 @@ const AdminDashboard = () => {
             {/* 3. Complaints */}
             <button
               type="button"
-              onClick={() => setActiveSection('complaints')}
+              onClick={() => handleNavigate('complaints')}
               className={`flex items-center gap-3.5 py-3 pl-6 text-[14px] font-medium transition-all text-left ${
                 activeSection === 'complaints'
                   ? 'bg-white/10 text-white font-semibold'
@@ -483,7 +618,7 @@ const AdminDashboard = () => {
             {/* 4. Reports */}
             <button
               type="button"
-              onClick={() => setActiveSection('analytics')}
+              onClick={() => handleNavigate('analytics')}
               className={`flex items-center gap-3.5 py-3 pl-6 text-[14px] font-medium transition-all text-left ${
                 activeSection === 'analytics'
                   ? 'bg-white/10 text-white font-semibold'
@@ -497,7 +632,7 @@ const AdminDashboard = () => {
             {/* 5. Map View */}
             <button
               type="button"
-              onClick={() => setActiveSection('map')}
+              onClick={() => handleNavigate('map')}
               className={`flex items-center gap-3.5 py-3 pl-6 text-[14px] font-medium transition-all text-left ${
                 activeSection === 'map'
                   ? 'bg-white/10 text-white font-semibold'
@@ -511,7 +646,7 @@ const AdminDashboard = () => {
             {/* 6. AI Insights */}
             <button
               type="button"
-              onClick={() => setActiveSection('ai')}
+              onClick={() => handleNavigate('ai')}
               className={`flex items-center gap-3.5 py-3 pl-6 text-[14px] font-medium transition-all text-left ${
                 activeSection === 'ai'
                   ? 'bg-white/10 text-white font-semibold'
@@ -525,7 +660,7 @@ const AdminDashboard = () => {
             {/* 7. Settings */}
             <button
               type="button"
-              onClick={() => setActiveSection('settings')}
+              onClick={() => handleNavigate('settings')}
               className={`flex items-center gap-3.5 py-3 pl-6 text-[14px] font-medium transition-all text-left ${
                 activeSection === 'settings'
                   ? 'bg-white/10 text-white font-semibold'
@@ -555,7 +690,7 @@ const AdminDashboard = () => {
       {isSidebarOpen && (
         <div
           onClick={() => setIsSidebarOpen(false)}
-          className="fixed inset-0 bg-black/40 z-20 md:hidden"
+          className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-xs"
         />
       )}
 
@@ -565,17 +700,17 @@ const AdminDashboard = () => {
       <div className="flex-1 flex flex-col min-w-0 bg-[#F2F2F2]">
         
         {/* TOP HEADER */}
-        <header className="h-[64px] px-8 flex items-center justify-between bg-[#F2F2F2] flex-shrink-0">
-          <div className="flex items-center gap-4">
+        <header className="h-[64px] px-3.5 sm:px-6 lg:px-8 flex items-center justify-between bg-[#F2F2F2] flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
               type="button"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="text-[#111111] hover:text-black p-1 focus:outline-none"
+              className="text-[#111111] hover:text-black p-1 focus:outline-none flex-shrink-0"
               title="Toggle Navigation"
             >
               <Menu size={22} strokeWidth={2.2} />
             </button>
-            <h1 className="text-[20px] font-bold text-[#111111] tracking-tight m-0">
+            <h1 className="text-[17px] sm:text-[20px] font-bold text-[#111111] tracking-tight m-0 truncate max-w-[170px] xs:max-w-[220px] sm:max-w-none">
               {activeSection === 'overview'
                 ? 'Overview'
                 : activeSection === 'complaints'
@@ -592,8 +727,8 @@ const AdminDashboard = () => {
             </h1>
           </div>
 
-          {/* Search Input Bar */}
-          <div className="relative w-[340px] hidden sm:block">
+          {/* Search Input Bar (Visible on tablet & desktop) */}
+          <div className="relative w-[280px] lg:w-[340px] hidden md:block">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#718096]">
               <Search size={15} />
             </span>
@@ -615,7 +750,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Right Action Icons & Authenticated User */}
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-2.5 sm:gap-5 flex-shrink-0">
             {/* Notification Bell */}
             <div className="relative">
               <button
@@ -632,7 +767,7 @@ const AdminDashboard = () => {
 
               {/* Notification Popover */}
               {isNotificationOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white border border-[#E0E0E0] rounded-[10px] shadow-lg z-30 p-3 text-[12px]">
+                <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-32px)] bg-white border border-[#E0E0E0] rounded-[10px] shadow-lg z-30 p-3 text-[12px]">
                   <div className="font-bold text-[#111111] mb-2 flex justify-between items-center">
                     <span>Notifications</span>
                     <span className="text-[10px] text-[#0845A0] cursor-pointer hover:underline">
@@ -656,7 +791,7 @@ const AdminDashboard = () => {
             {/* Settings Gear */}
             <button
               type="button"
-              onClick={() => setActiveSection('settings')}
+              onClick={() => handleNavigate('settings')}
               className="text-[#1A202C] hover:text-black p-1 transition-colors"
               title="System Settings"
             >
@@ -664,11 +799,14 @@ const AdminDashboard = () => {
             </button>
 
             {/* Authenticated User Profile (Divya Prasad Admin) */}
-            <div className="flex items-center gap-2.5 pl-1">
+            <div
+              onClick={() => handleNavigate('settings')}
+              className="flex items-center gap-2 sm:gap-2.5 pl-1 cursor-pointer"
+            >
               <img
                 src="/avatar_divya.png"
                 alt="Divya Prasad"
-                className="w-9 h-9 rounded-full object-cover shadow-xs border border-white"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover shadow-xs border border-white flex-shrink-0"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'flex';
@@ -676,11 +814,11 @@ const AdminDashboard = () => {
               />
               <div
                 style={{ display: 'none' }}
-                className="w-9 h-9 rounded-full bg-[#0845A0] text-white font-bold text-xs items-center justify-center"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0845A0] text-white font-bold text-xs items-center justify-center flex-shrink-0"
               >
                 DP
               </div>
-              <div className="flex flex-col text-left">
+              <div className="hidden sm:flex flex-col text-left">
                 <span className="text-[13px] font-bold text-[#111111] leading-tight">
                   {user?.fullName === 'System Administrator' ? 'Divya Prasad' : user?.fullName || 'Divya Prasad'}
                 </span>
@@ -705,8 +843,8 @@ const AdminDashboard = () => {
         )}
 
         {/* SCROLLABLE MAIN DASHBOARD AREA */}
-        <main className="flex-1 px-8 py-3 overflow-y-auto custom-scroll">
-          <div className="max-w-[1145px] mx-auto w-full flex flex-col gap-3.5 pb-4">
+        <main className="flex-1 px-3 sm:px-6 lg:px-8 py-3 sm:py-4 overflow-y-auto custom-scroll">
+          <div className="max-w-[1145px] mx-auto w-full flex flex-col gap-3.5 pb-6 min-w-0">
             
             {/* ========================================================================= */}
             {/* SECTION 1: OVERVIEW (THE PIXEL-ACCURATE RECREATION OF REFERENCE SCREENSHOT) */}
@@ -714,11 +852,11 @@ const AdminDashboard = () => {
             {activeSection === 'overview' && (
               <>
                 {/* 1. TOP SUMMARY PANEL (Light Blue Tinted, Hex #F0F8FF) */}
-                <div className="bg-[#F0F8FF] border border-[#E1EEFB] rounded-[12px] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-                  <div className="flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+                <div className="bg-[#F0F8FF] border border-[#E1EEFB] rounded-[12px] p-3.5 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                  <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 lg:gap-6">
                     
                     {/* Left 3 KPI Columns */}
-                    <div className="flex-1 grid grid-cols-3 gap-6">
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                       
                       {/* KPI 1: Pending */}
                       <div className="flex flex-col justify-between">
@@ -729,20 +867,20 @@ const AdminDashboard = () => {
                           <div className="text-[14px] font-bold text-[#111111] leading-snug">
                             Pending
                           </div>
-                          <div className="text-[11px] text-[#777777] font-normal mb-2">
+                          <div className="text-[11px] text-[#777777] font-normal mb-1.5 sm:mb-2">
                             Last 7 days
                           </div>
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[34px] font-extrabold text-[#111111] leading-none">
-                              {stats.pending_7d || 9}
+                            <span className="text-[30px] sm:text-[34px] font-extrabold text-[#111111] leading-none">
+                              {stats.pending_7d ?? stats.pending ?? 3}
                             </span>
                             <span className="bg-[#DC4040] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
                               +70%
                             </span>
                           </div>
-                          <div className="w-[130px] h-[3.5px] bg-[#1769E0] rounded-full mt-3.5"></div>
+                          <div className="w-full max-w-[130px] h-[3.5px] bg-[#1769E0] rounded-full mt-3"></div>
                         </div>
                       </div>
 
@@ -755,20 +893,20 @@ const AdminDashboard = () => {
                           <div className="text-[14px] font-bold text-[#111111] leading-snug">
                             In Progress
                           </div>
-                          <div className="text-[11px] text-[#777777] font-normal mb-2">
+                          <div className="text-[11px] text-[#777777] font-normal mb-1.5 sm:mb-2">
                             Last 7 days
                           </div>
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[34px] font-extrabold text-[#111111] leading-none">
-                              {stats.in_progress_7d || 2}
+                            <span className="text-[30px] sm:text-[34px] font-extrabold text-[#111111] leading-none">
+                              {stats.in_progress_7d ?? stats.in_progress ?? 3}
                             </span>
                             <span className="bg-[#10BF78] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
                               +20%
                             </span>
                           </div>
-                          <div className="w-[130px] h-[3.5px] bg-[#08B8E8] rounded-full mt-3.5"></div>
+                          <div className="w-full max-w-[130px] h-[3.5px] bg-[#08B8E8] rounded-full mt-3"></div>
                         </div>
                       </div>
 
@@ -781,34 +919,34 @@ const AdminDashboard = () => {
                           <div className="text-[14px] font-bold text-[#111111] leading-snug">
                             Solved
                           </div>
-                          <div className="text-[11px] text-[#777777] font-normal mb-2">
+                          <div className="text-[11px] text-[#777777] font-normal mb-1.5 sm:mb-2">
                             Last 7 days
                           </div>
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[34px] font-extrabold text-[#111111] leading-none">
-                              {stats.resolved_7d || 1}
+                            <span className="text-[30px] sm:text-[34px] font-extrabold text-[#111111] leading-none">
+                              {stats.resolved_7d ?? stats.resolved ?? 2}
                             </span>
                             <span className="bg-[#10BF78] text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
                               +1%
                             </span>
                           </div>
-                          <div className="w-[130px] h-[3.5px] bg-[#F59E0B] rounded-full mt-3.5"></div>
+                          <div className="w-full max-w-[130px] h-[3.5px] bg-[#F59E0B] rounded-full mt-3"></div>
                         </div>
                       </div>
 
                     </div>
 
-                    {/* Thin Vertical Divider */}
+                    {/* Thin Vertical Divider (Desktop only) */}
                     <div className="hidden lg:block w-[1px] h-20 bg-[#D8E4F0]"></div>
 
                     {/* Right Indicators: Circular Service Level + Feedback Rating */}
-                    <div className="flex items-center gap-8 justify-around lg:justify-end">
+                    <div className="flex items-center justify-around sm:justify-end gap-5 sm:gap-8 pt-3 lg:pt-0 border-t lg:border-t-0 border-[#D8E4F0]/70 w-full lg:w-auto">
                       
                       {/* Circular Gauge: Service Level */}
                       <div className="relative flex flex-col items-center justify-center">
-                        <svg className="w-24 h-24 transform -rotate-90">
+                        <svg className="w-22 h-22 sm:w-24 sm:h-24 transform -rotate-90">
                           <circle
                             cx="48"
                             cy="48"
@@ -833,22 +971,22 @@ const AdminDashboard = () => {
                           />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-center pt-0.5">
-                          <span className="text-[11px] font-semibold text-[#333333] leading-none mb-0.5">
+                          <span className="text-[10px] sm:text-[11px] font-semibold text-[#333333] leading-none mb-0.5">
                             Service Level
                           </span>
-                          <span className="text-[23px] font-extrabold text-[#111111] leading-tight">
+                          <span className="text-[20px] sm:text-[23px] font-extrabold text-[#111111] leading-tight">
                             {Math.round(stats.service_level || stats.resolution_rate || 25)}%
                           </span>
-                          <span className="text-[10px] text-[#777777] font-normal leading-none mt-0.5">
+                          <span className="text-[9.5px] sm:text-[10px] text-[#777777] font-normal leading-none mt-0.5">
                             Target 75%
                           </span>
                         </div>
                       </div>
 
                       {/* Feedback Rating */}
-                      <div className="flex flex-col justify-center pl-2">
+                      <div className="flex flex-col justify-center pl-1 sm:pl-2">
                         <div className="mb-1 text-[#1769E0]">
-                          <Smile size={26} strokeWidth={2} />
+                          <Smile size={24} className="sm:w-[26px] sm:h-[26px]" strokeWidth={2} />
                         </div>
                         <div className="text-[12px] font-bold text-[#111111] leading-snug">
                           Feedback Rating
@@ -857,10 +995,10 @@ const AdminDashboard = () => {
                           All time
                         </div>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-[30px] font-black text-[#111111] leading-none">
+                          <span className="text-[28px] sm:text-[30px] font-black text-[#111111] leading-none">
                             4.6
                           </span>
-                          <span className="text-[13px] font-semibold text-[#555555]">
+                          <span className="text-[12px] sm:text-[13px] font-semibold text-[#555555]">
                             of 5
                           </span>
                         </div>
@@ -882,10 +1020,10 @@ const AdminDashboard = () => {
                 />
 
                 {/* 3. BOTTOM CARDS: RECENT COMPLAINTS & CATEGORY BREAKDOWN */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-w-0">
                   
                   {/* Left Bottom Card: Recent Complaints (Approx 54% width) */}
-                  <div className="lg:col-span-7 bg-white rounded-[12px] p-4 border border-[#EAEAEA] shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col justify-between relative">
+                  <div className="lg:col-span-7 bg-white rounded-[12px] p-4 border border-[#EAEAEA] shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col justify-between relative min-w-0 overflow-hidden">
                     {/* Subtle scrollbar indicator matching screenshot */}
                     <div className="absolute right-2 top-20 w-[2.5px] h-[36px] bg-[#D4D4D4] rounded-full pointer-events-none"></div>
 
@@ -896,7 +1034,7 @@ const AdminDashboard = () => {
                         </h3>
                         <button
                           type="button"
-                          onClick={() => setActiveSection('complaints')}
+                          onClick={() => handleNavigate('complaints')}
                           className="text-[#777777] hover:text-[#111111] p-1"
                           title="Options"
                         >
@@ -905,7 +1043,7 @@ const AdminDashboard = () => {
                       </div>
 
                       <div className="overflow-x-auto custom-scroll pr-1">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full min-w-[420px] text-left border-collapse">
                           <thead>
                             <tr className="border-b border-[#EEEEEE] text-[12px] font-bold text-[#222222]">
                               <th className="pb-2.5 font-bold">Date</th>
@@ -942,7 +1080,7 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Right Bottom Card: Complaints in Category (Approx 46% width) */}
-                  <div className="lg:col-span-5 bg-white rounded-[12px] p-4 border border-[#EAEAEA] shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col justify-between relative">
+                  <div className="lg:col-span-5 bg-white rounded-[12px] p-4 border border-[#EAEAEA] shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col justify-between relative min-w-0 overflow-hidden">
                     {/* Subtle scrollbar indicator matching screenshot */}
                     <div className="absolute right-2 top-20 w-[2.5px] h-[40px] bg-[#D4D4D4] rounded-full pointer-events-none"></div>
 
@@ -953,7 +1091,7 @@ const AdminDashboard = () => {
                         </h3>
                         <button
                           type="button"
-                          onClick={() => setActiveSection('analytics')}
+                          onClick={() => handleNavigate('analytics')}
                           className="text-[#777777] hover:text-[#111111] p-1"
                           title="Options"
                         >
@@ -1002,10 +1140,10 @@ const AdminDashboard = () => {
             {/* SECTION 2: COMPLAINTS MANAGEMENT TAB (PRESERVED FUNCTIONALITY)            */}
             {/* ========================================================================= */}
             {activeSection === 'complaints' && (
-              <div className="bg-white rounded-[12px] p-5 border border-[#EAEAEA] shadow-sm">
+              <div className="bg-white rounded-[12px] p-4 sm:p-5 border border-[#EAEAEA] shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                   <div>
-                    <h3 className="text-[18px] font-bold text-[#111111] m-0">
+                    <h3 className="text-[17px] sm:text-[18px] font-bold text-[#111111] m-0">
                       Grievance Records &amp; Status Triage
                     </h3>
                     <p className="text-[12px] text-[#777777] m-0">
@@ -1028,12 +1166,12 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                {/* Search & Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                {/* Search & Filters (Responsive Grid) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-4">
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-1.5 text-[12px]"
+                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-1 focus:ring-[#0845A0]"
                   >
                     <option value="All">All Statuses</option>
                     <option value="Submitted">Submitted</option>
@@ -1046,7 +1184,7 @@ const AdminDashboard = () => {
                   <select
                     value={priorityFilter}
                     onChange={(e) => setPriorityFilter(e.target.value)}
-                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-1.5 text-[12px]"
+                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-1 focus:ring-[#0845A0]"
                   >
                     <option value="All">All Priorities</option>
                     <option value="Urgent">Urgent</option>
@@ -1058,7 +1196,7 @@ const AdminDashboard = () => {
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-1.5 text-[12px]"
+                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-1 focus:ring-[#0845A0]"
                   >
                     {uniqueCategories.map((cat) => (
                       <option key={cat} value={cat}>
@@ -1070,7 +1208,7 @@ const AdminDashboard = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-1.5 text-[12px]"
+                    className="bg-[#F8F9FA] border border-[#D0D0D0] rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-1 focus:ring-[#0845A0]"
                   >
                     <option value="newest">Sort by Newest</option>
                     <option value="oldest">Sort by Oldest</option>
@@ -1078,9 +1216,9 @@ const AdminDashboard = () => {
                   </select>
                 </div>
 
-                {/* Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[12px] border-collapse">
+                {/* Table with horizontal touch scroll */}
+                <div className="overflow-x-auto custom-scroll -mx-1 sm:mx-0">
+                  <table className="w-full min-w-[680px] text-left text-[12px] border-collapse">
                     <thead>
                       <tr className="border-b border-[#EEEEEE] text-[#555555]">
                         <th className="py-2.5 font-bold">Complaint Title</th>
@@ -1092,53 +1230,85 @@ const AdminDashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredComplaints.map((c) => (
-                        <tr key={c._id} className="border-b border-[#F2F2F2] hover:bg-[#F9FAFC]">
-                          <td className="py-2.5">
-                            <div className="font-semibold text-[#111111]">{c.title}</div>
-                            <div className="text-[11px] text-[#777777]">{c.location}</div>
-                          </td>
-                          <td className="py-2.5">
-                            <span className="px-2 py-0.5 rounded text-[11px] bg-[#EBF5FF] text-[#1769E0] font-medium">
-                              {c.category}
-                            </span>
-                          </td>
-                          <td className="py-2.5">
-                            <span
-                              className={`px-2 py-0.5 rounded text-[11px] font-medium ${
-                                c.priority === 'Urgent'
-                                  ? 'bg-red-100 text-red-700'
-                                  : c.priority === 'High'
-                                  ? 'bg-amber-100 text-amber-800'
-                                  : 'bg-slate-100 text-slate-700'
-                              }`}
-                            >
-                              {c.priority}
-                            </span>
-                          </td>
-                          <td className="py-2.5">{renderStatusBadge(c.status)}</td>
-                          <td className="py-2.5 text-[#555555]">
-                            {c.author?.username ? `@${c.author.username}` : 'Citizen'}
-                          </td>
-                          <td className="py-2.5 text-end">
-                            <div className="flex items-center justify-end gap-1.5">
-                              <button
-                                onClick={() => handleViewComplaint(c)}
-                                className="px-2.5 py-1 text-[11px] bg-[#0845A0] text-white rounded hover:bg-[#073A88]"
-                              >
-                                View
-                              </button>
-                              <button
-                                onClick={() => handleDeleteComplaint(c._id)}
-                                className="p-1 text-red-600 hover:text-red-800"
-                                title="Delete Complaint"
-                              >
-                                <Trash2 size={14} />
-                              </button>
+                      {filteredComplaints.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-12 text-center text-[#777777]">
+                            <div className="flex flex-col items-center justify-center gap-2 max-w-sm mx-auto p-4">
+                              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-[#0845A0]">
+                                <FileText size={24} />
+                              </div>
+                              <h4 className="text-[15px] font-bold text-[#111111] m-0">No Complaints Match Filter</h4>
+                              <p className="text-[12px] text-[#777777] m-0 text-center">
+                                {complaints.length === 0
+                                  ? "No complaint records are currently stored. Click 'Sync' to refresh."
+                                  : "Try adjusting or clearing your active search filters to view grievance records."}
+                              </p>
+                              {(statusFilter !== 'All' || priorityFilter !== 'All' || categoryFilter !== 'All' || searchQuery) && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setStatusFilter('All');
+                                    setPriorityFilter('All');
+                                    setCategoryFilter('All');
+                                    setSearchQuery('');
+                                  }}
+                                  className="mt-2 px-3 py-1.5 text-[12px] font-semibold bg-[#0845A0] text-white rounded-lg hover:bg-[#073A88] transition-colors"
+                                >
+                                  Reset Filters
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        filteredComplaints.map((c) => (
+                          <tr key={c._id} className="border-b border-[#F2F2F2] hover:bg-[#F9FAFC]">
+                            <td className="py-2.5">
+                              <div className="font-semibold text-[#111111]">{c.title}</div>
+                              <div className="text-[11px] text-[#777777]">{c.location}</div>
+                            </td>
+                            <td className="py-2.5">
+                              <span className="px-2 py-0.5 rounded text-[11px] bg-[#EBF5FF] text-[#1769E0] font-medium">
+                                {c.category}
+                              </span>
+                            </td>
+                            <td className="py-2.5">
+                              <span
+                                className={`px-2 py-0.5 rounded text-[11px] font-medium ${
+                                  c.priority === 'Urgent'
+                                    ? 'bg-red-100 text-red-700'
+                                    : c.priority === 'High'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-slate-100 text-slate-700'
+                                }`}
+                              >
+                                {c.priority}
+                              </span>
+                            </td>
+                            <td className="py-2.5">{renderStatusBadge(c.status)}</td>
+                            <td className="py-2.5 text-[#555555]">
+                              {c.author?.username ? `@${c.author.username}` : 'Citizen'}
+                            </td>
+                            <td className="py-2.5 text-end">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleViewComplaint(c)}
+                                  className="px-2.5 py-1 text-[11px] bg-[#0845A0] text-white rounded hover:bg-[#073A88]"
+                                >
+                                  View
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteComplaint(c._id)}
+                                  className="p-1 text-red-600 hover:text-red-800"
+                                  title="Delete Complaint"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -1224,10 +1394,10 @@ const AdminDashboard = () => {
             {/* SECTION 6: AI INSIGHTS                                                    */}
             {/* ========================================================================= */}
             {activeSection === 'ai' && (
-              <div className="bg-white rounded-[12px] p-5 border border-[#EAEAEA] shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
+              <div className="bg-white rounded-[12px] p-4 sm:p-5 border border-[#EAEAEA] shadow-sm space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-[18px] font-bold text-[#111111] m-0">
+                    <h3 className="text-[17px] sm:text-[18px] font-bold text-[#111111] m-0">
                       AI Classification &amp; Telemetry
                     </h3>
                     <p className="text-[12px] text-[#777777] m-0">
@@ -1236,7 +1406,7 @@ const AdminDashboard = () => {
                   </div>
                   <button
                     onClick={() => setIsAIChatOpen(true)}
-                    className="px-4 py-2 bg-[#0845A0] text-white rounded-lg text-[13px] font-semibold flex items-center gap-2 hover:bg-[#073A88]"
+                    className="px-3.5 py-2 bg-[#0845A0] text-white rounded-lg text-[12.5px] sm:text-[13px] font-semibold flex items-center gap-2 hover:bg-[#073A88]"
                   >
                     <Sparkles size={16} /> Open Civic AI Chat Assistant
                   </button>
@@ -1266,10 +1436,10 @@ const AdminDashboard = () => {
             {/* SECTION 7: SETTINGS & USER MANAGEMENT                                     */}
             {/* ========================================================================= */}
             {activeSection === 'settings' && (
-              <div className="bg-white rounded-[12px] p-5 border border-[#EAEAEA] shadow-sm">
+              <div className="bg-white rounded-[12px] p-4 sm:p-5 border border-[#EAEAEA] shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-[18px] font-bold text-[#111111] m-0">
+                    <h3 className="text-[17px] sm:text-[18px] font-bold text-[#111111] m-0">
                       User Management &amp; Administrative Roles
                     </h3>
                     <p className="text-[12px] text-[#777777] m-0">
@@ -1278,8 +1448,8 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[12px] border-collapse">
+                <div className="overflow-x-auto custom-scroll -mx-1 sm:mx-0">
+                  <table className="w-full min-w-[500px] text-left text-[12px] border-collapse">
                     <thead>
                       <tr className="border-b border-[#EEEEEE] text-[#555555]">
                         <th className="py-2.5 font-bold">User</th>

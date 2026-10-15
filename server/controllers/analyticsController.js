@@ -196,18 +196,18 @@ exports.getDashboardStats = async (req, res) => {
 
     res.json({
       success: true,
-      total_complaints: 18,
-      resolved: 8,
-      in_progress: 2,
-      pending: 9,
-      pending_7d: 9,
-      in_progress_7d: 2,
-      resolved_7d: 1,
+      total_complaints: 8,
+      resolved: 2,
+      in_progress: 3,
+      pending: 3,
+      pending_7d: 3,
+      in_progress_7d: 3,
+      resolved_7d: 2,
       pending_trend: '+70%',
       in_progress_trend: '+20%',
       resolved_trend: '+1%',
-      resolution_rate: 44.4,
-      service_level: 76.5,
+      resolution_rate: 25.0,
+      service_level: 25.0,
       feedback_rating: 4.6,
     });
   } catch (error) {

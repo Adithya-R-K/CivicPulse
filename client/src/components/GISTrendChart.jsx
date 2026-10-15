@@ -152,12 +152,25 @@ const GISTrendChart = ({
   }, [yMax]);
 
   return (
-    <div className="bg-white rounded-[12px] p-4 pt-3.5 pb-2.5 border border-[#EAEAEA] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
+    <div className="bg-white rounded-[12px] p-4 pt-3.5 pb-2.5 border border-[#EAEAEA] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative min-w-0 overflow-hidden">
       {/* Chart Header */}
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-[16px] font-bold text-[#111111] tracking-tight m-0">
-          Total Complaints
-        </h3>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-3">
+          <h3 className="text-[16px] font-bold text-[#111111] tracking-tight m-0">
+            Total Complaints
+          </h3>
+          {/* Mobile Inline Legend */}
+          <div className="flex sm:hidden items-center gap-2.5 text-[10.5px] font-medium text-[#444444]">
+            <div className="flex items-center gap-1">
+              <span className="w-2 h-1 rounded bg-[#1769E0]"></span>
+              <span>Pending ({activePending})</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-2 h-1 rounded bg-[#08B8E8]"></span>
+              <span>In Progress ({activeInProgress})</span>
+            </div>
+          </div>
+        </div>
 
         {/* Date Filter Dropdown */}
         <div className="relative">
@@ -194,9 +207,9 @@ const GISTrendChart = ({
 
       {/* Chart Canvas Area */}
       <div className="relative h-[225px] w-full">
-        {/* Floating Legend Box matching screenshot positioned over Feb 10 */}
+        {/* Floating Legend Box matching screenshot positioned over Feb 10 (Desktop / Tablet) */}
         <div
-          className="absolute z-10 pointer-events-none"
+          className="hidden sm:block absolute z-10 pointer-events-none"
           style={{
             left: '69%',
             top: '8%',
@@ -221,9 +234,9 @@ const GISTrendChart = ({
           </div>
         </div>
 
-        {/* Outer Halo Circle on Feb 10 Data Point */}
+        {/* Outer Halo Circle on Feb 10 Data Point (Desktop / Tablet) */}
         <div
-          className="absolute rounded-full border border-[#1769E0]/40 pointer-events-none"
+          className="hidden sm:block absolute rounded-full border border-[#1769E0]/40 pointer-events-none"
           style={{
             width: '18px',
             height: '18px',

@@ -43,11 +43,11 @@ const Login = () => {
   };
 
   return (
-    <div className="container py-5">
+    <div className="container py-3 py-sm-5">
       <div className="row justify-content-center">
-        <div className="col-md-5">
+        <div className="col-12 col-sm-10 col-md-8 col-lg-5">
           <div className="card border-0 shadow-lg" style={{ borderRadius: '20px' }}>
-            <div className="card-body p-5">
+            <div className="card-body p-3.5 p-sm-4 p-md-5">
               <div className="d-flex justify-content-start mb-3">
                 <button
                   type="button"
@@ -142,7 +142,7 @@ const Login = () => {
                     setUsername('admin');
                     setPassword('Admin123');
                   }}
-                  className="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-xs"
+                  className="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-xs w-100"
                 >
                   Fill Admin Credentials (admin / Admin123)
                 </button>
