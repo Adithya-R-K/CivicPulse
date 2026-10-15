@@ -797,36 +797,6 @@ const AdminDashboard = () => {
             >
               <Settings size={20} strokeWidth={1.8} />
             </button>
-
-            {/* Authenticated User Profile (Divya Prasad Admin) */}
-            <div
-              onClick={() => handleNavigate('settings')}
-              className="flex items-center gap-2 sm:gap-2.5 pl-1 cursor-pointer"
-            >
-              <img
-                src="/avatar_divya.png"
-                alt="Divya Prasad"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover shadow-xs border border-white flex-shrink-0"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
-              />
-              <div
-                style={{ display: 'none' }}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0845A0] text-white font-bold text-xs items-center justify-center flex-shrink-0"
-              >
-                DP
-              </div>
-              <div className="hidden sm:flex flex-col text-left">
-                <span className="text-[13px] font-bold text-[#111111] leading-tight">
-                  {user?.fullName === 'System Administrator' ? 'Divya Prasad' : user?.fullName || 'Divya Prasad'}
-                </span>
-                <span className="text-[11px] text-[#777777] leading-none capitalize">
-                  {user?.role || 'Admin'}
-                </span>
-              </div>
-            </div>
           </div>
         </header>
 

@@ -32,10 +32,16 @@ const Navbar = () => {
         )}
 
         <Link
-          className="navbar-brand fw-bold"
+          className="navbar-brand fw-bold d-flex align-items-center gap-2"
           to={user ? (isAdmin ? "/admin" : "/dashboard") : "/login"}
         >
-          <i className="fas fa-heartbeat me-2"></i>CivicPulse
+          <img
+            src="/logo_icon.png"
+            alt="CivicPulse"
+            className="bg-white rounded-circle p-0.5 shadow-sm"
+            style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+          />
+          <span>CivicPulse</span>
         </Link>
 
         <button

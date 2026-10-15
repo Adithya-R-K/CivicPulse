@@ -56,6 +56,12 @@ const Register = () => {
               </div>
 
               <div className="text-center mb-4">
+                <img
+                  src="/logo_icon.png"
+                  alt="CivicPulse"
+                  className="mx-auto mb-2.5 drop-shadow-sm"
+                  style={{ width: '68px', height: '68px', objectFit: 'contain' }}
+                />
                 <h2 className="fw-bold text-primary">
                   <i className="fas fa-user-plus me-2"></i>Join CivicPulse
                 </h2>
